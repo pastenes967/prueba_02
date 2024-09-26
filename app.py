@@ -1,35 +1,31 @@
-import requests
+import openai
+import streamlit as st
 
-# Buscar un libro usando la API de Open Library
-query = "Cien años de soledad"  # Reemplaza con el libro que desees buscar
-url = f"https://openlibrary.org/search.json?q={query}"
-response = requests.get(url)
+# Configurar la clave API de OpenAI
+openai.api_key = "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"
 
-# Convertir la respuesta en formato JSON
-data = response.json()
+# Función para generar frases motivacionales
+def generar_frase_motivacional():
+    prompt = "Genera una frase motivacional corta y poderosa."
+    
+    # Llamada al modelo GPT-4-o-mini
+    response = openai.Completion.create(
+        engine="gpt-4-o-mini",  # Modelo específico
+        prompt=prompt,
+        max_tokens=60,          # Límite de palabras para la respuesta
+        n=1,                    # Generar una sola frase
+        stop=None,
+        temperature=0.7         # Controla la creatividad
+    )
+    
+    frase = response.choices[0].text.strip()
+    return frase
 
-# Mostrar el título y el identificador de Open Library del primer libro
-if data['docs']:
-    book = data['docs'][0]
-    title = book['title']
-    olid = book['edition_key'][0]
-    
-    print(f"Título: {title}")
-    print(f"OLID: {olid}")
-    
-    # Descargar el libro si está disponible en formato digital
-    download_url = f"https://openlibrary.org/books/{olid}.json"
-    book_info = requests.get(download_url).json()
-    
-    if 'formats' in book_info and 'pdf' in book_info['formats']:
-        pdf_url = book_info['formats']['pdf']['url']
-        pdf_response = requests.get(pdf_url)
-        
-        with open(f"{title}.pdf", 'wb') as file:
-            file.write(pdf_response.content)
-        
-        print(f"Libro {title} descargado.")
-    else:
-        print("Este libro no está disponible en formato digital.")
-else:
-    print("No se encontró el libro.")
+# Interfaz de Streamlit
+st.title("Generador de Frases Motivacionales")
+st.write("Haz clic en el botón para recibir una frase motivacional.")
+
+# Botón para generar frase
+if st.button("Generar Frase"):
+    frase = generar_frase_motivacional()
+    st.write(f"💡 **Frase motivacional:** {frase}")
