@@ -10,7 +10,7 @@ def generar_frase_motivacional():
     
     # Llamada al modelo GPT-4-o-mini
     response = openai.Completion.create(
-        engine="gpt-4o-mini",,  # Modelo específico
+        engine="gpt-4o-mini",  # Modelo específico
         prompt=prompt,
         max_tokens=60,          # Límite de palabras para la respuesta
         n=1,                    # Generar una sola frase
